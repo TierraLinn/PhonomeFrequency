@@ -29,20 +29,28 @@ What this phase proves:
 
 Goal: Make the app listen to audio structure instead of only using simulated readings.
 
-Build:
+Built now:
 
 - Web Audio API feature extraction in the browser.
-- Pitch contour.
-- Duration and spacing.
-- Loudness envelope.
+- Duration.
+- Loudness and dynamic range.
+- Estimated pitch.
 - Repetition timing.
 - Frequency-band energy.
-- Real spectrogram visual generation.
+- Feature-driven spectrogram-style visual generation.
+- Byte-level fallback when a browser cannot decode a file.
 
 Output:
 
 - A recording has measurable acoustic features.
 - Readings can cite actual sound evidence.
+
+Next refinement:
+
+- Richer pitch contour.
+- Stronger call interval detection.
+- More detailed envelope and harmonicity features.
+- Species-tuned acoustic extraction.
 
 ## Phase 3: Real Data Storage
 

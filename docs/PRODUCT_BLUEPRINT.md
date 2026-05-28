@@ -20,21 +20,22 @@ PhonomeFrequency does not claim perfect animal translation. It builds translatio
 
 - Next.js app shell.
 - Signal Chamber upload and microphone capture.
-- Simulated analysis engine.
-- Spectrogram-style visual placeholders.
+- Simulated analysis engine informed by browser-side acoustic features.
+- Spectrogram-style visuals generated from decoded acoustic bands when possible.
+- Web Audio API feature extraction for duration, amplitude, pitch estimate, centroid, pulse count, pulse rate, dominant band, waveform, and spectral bands.
 - Animal profile creation.
 - Echo Archive.
 - Feedback loop that improves profile confidence and maturity.
 - Research Vault and privacy controls.
 - Local browser storage for development.
-- Health endpoint for deployment checks.
+- Static health file for deployment checks.
 
 ## Next Backend Milestone
 
 1. Add database tables for users, animal profiles, recordings, readings, feedback labels, and source archive metadata.
 2. Store audio in object storage instead of local browser storage.
 3. Move analysis into a server route so uploaded recordings can be queued, processed, and re-read.
-4. Add real feature extraction with spectrograms, pitch contours, duration, envelope, harmonicity, repetition, and call intervals.
+4. Expand real feature extraction with richer spectrograms, pitch contours, envelope, harmonicity, repetition, and call intervals.
 5. Add licensed acoustic archive ingestion.
 6. Train classifiers for species, signal category, emotional state estimate, and context probability.
 7. Add individual animal calibration so one pet or observed wild animal becomes more readable over time.

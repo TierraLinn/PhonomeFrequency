@@ -4,11 +4,13 @@ import { Mic, Square, Upload } from "lucide-react";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { analyzeSignal, hash } from "@/lib/analysis";
+import { extractAcousticFeatures } from "@/lib/audio-features";
 import { addRecording, createId } from "@/lib/storage";
-import type { Recording } from "@/lib/types";
+import type { AcousticFeatures, Recording } from "@/lib/types";
 import { usePhonomeStore } from "@/components/store-provider";
 import { ProfilePicker } from "@/components/profile-picker";
 import { Spectrogram } from "@/components/spectrogram";
+import { AcousticFeaturePanel } from "@/components/acoustic-feature-panel";
 
 export function SignalIntake() {
   const router = useRouter();
@@ -17,7 +19,10 @@ export function SignalIntake() {
   const [file, setFile] = useState<File | null>(null);
   const [recordingUrl, setRecordingUrl] = useState<string>("");
   const [recordingBlob, setRecordingBlob] = useState<Blob | null>(null);
+  const [acousticFeatures, setAcousticFeatures] = useState<AcousticFeatures | undefined>();
+  const [featureStatus, setFeatureStatus] = useState("Waiting for an audio signal.");
   const [formError, setFormError] = useState("");
+  const [isExtracting, setIsExtracting] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const fileInput = useRef<HTMLInputElement | null>(null);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
@@ -38,6 +43,7 @@ export function SignalIntake() {
       const blob = new Blob(chunks.current, { type: "audio/webm" });
       setRecordingBlob(blob);
       setRecordingUrl(URL.createObjectURL(blob));
+      void extractFeatures(blob, "Microphone capture decoded into an acoustic feature layer.");
       stream.getTracks().forEach((track) => track.stop());
     };
     recorder.start();
@@ -62,7 +68,8 @@ export function SignalIntake() {
     const fileName = activeFile?.name ?? `${selectedProfile.name.toLowerCase()}-field-recording.webm`;
     const dataUrl = activeFile ? await fileToDataUrl(activeFile) : recordingUrl;
     const size = activeFile?.size ?? recordingBlob?.size ?? 0;
-    const analysis = analyzeSignal(selectedProfile, fileName, contextNote);
+    const features = acousticFeatures ?? (activeFile ? await extractAcousticFeatures(activeFile) : recordingBlob ? await extractAcousticFeatures(recordingBlob) : undefined);
+    const analysis = analyzeSignal(selectedProfile, fileName, contextNote, features);
     const id = createId("signal");
 
     const recording: Recording = {
@@ -77,6 +84,7 @@ export function SignalIntake() {
       createdAt: new Date().toISOString(),
       contextNote,
       spectrogramSeed: previewSeed,
+      acousticFeatures: features,
       analysis
     };
 
@@ -100,9 +108,16 @@ export function SignalIntake() {
                 accept="audio/*,video/*"
                 ref={fileInput}
                 onChange={(event) => {
-                  setFile(event.target.files?.[0] ?? null);
+                  const nextFile = event.target.files?.[0] ?? null;
+                  setFile(nextFile);
                   setRecordingBlob(null);
                   setRecordingUrl("");
+                  setAcousticFeatures(undefined);
+                  if (nextFile) {
+                    void extractFeatures(nextFile, "Uploaded file decoded into an acoustic feature layer.");
+                  } else {
+                    setFeatureStatus("Waiting for an audio signal.");
+                  }
                 }}
                 className="w-full cursor-pointer text-sm text-slate-300 file:mr-4 file:border-0 file:bg-ion file:px-4 file:py-2 file:text-sm file:font-semibold file:text-abyss"
               />
@@ -139,7 +154,7 @@ export function SignalIntake() {
           {formError ? <p className="border border-ember/30 bg-ember/10 px-3 py-2 text-sm text-amber-100">{formError}</p> : null}
 
           <button type="button" onClick={submitSignal} className="w-full border border-ion/40 bg-ion px-4 py-3 text-sm font-semibold text-abyss shadow-glow">
-            Generate probabilistic reading
+            {isExtracting ? "Extracting acoustic layer..." : "Generate probabilistic reading"}
           </button>
         </div>
       </section>
@@ -150,17 +165,36 @@ export function SignalIntake() {
             <p className="font-mono text-xs uppercase tracking-[0.22em] text-violet">Signal chamber</p>
             <h2 className="mt-2 text-2xl font-semibold text-white">Live analysis preview</h2>
           </div>
-          <span className="font-mono text-xs text-slate-500">MVP SIM</span>
+          <span className="font-mono text-xs text-slate-500">PHASE 2</span>
         </div>
-        <Spectrogram seed={previewSeed} />
+        <Spectrogram seed={previewSeed} bands={acousticFeatures?.spectralBands} />
+        <p className="mt-3 border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-slate-300">{featureStatus}</p>
         <div className="mt-5 grid gap-3 sm:grid-cols-3">
           <PreviewStat label="Species base" value={selectedProfile?.species ?? "none"} />
           <PreviewStat label="Profile" value={selectedProfile?.name ?? "none"} />
           <PreviewStat label="Input" value={file?.name ?? (recordingBlob ? "mic capture" : "waiting")} />
         </div>
+        <div className="mt-4">
+          <AcousticFeaturePanel features={acousticFeatures} compact />
+        </div>
       </section>
     </div>
   );
+
+  async function extractFeatures(blob: Blob, successMessage: string) {
+    setIsExtracting(true);
+    setFeatureStatus("Decoding acoustic structure in browser...");
+    try {
+      const features = await extractAcousticFeatures(blob);
+      setAcousticFeatures(features);
+      setFeatureStatus(features.source === "decoded-audio" ? successMessage : "Audio decoder fallback used; reading will use byte-level signal structure.");
+    } catch {
+      setAcousticFeatures(undefined);
+      setFeatureStatus("Could not extract acoustic features from this file. Try another audio format.");
+    } finally {
+      setIsExtracting(false);
+    }
+  }
 }
 
 function PreviewStat({ label, value }: { label: string; value: string }) {

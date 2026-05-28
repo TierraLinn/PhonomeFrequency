@@ -38,16 +38,18 @@ export default function LandingPage() {
             </Link>
           </div>
         </div>
-        <Panel className="relative overflow-hidden">
-          <div className="absolute right-5 top-5 font-mono text-[10px] uppercase tracking-[0.24em] text-slate-500">scientific oracle interface</div>
-          <div className="mb-5 flex items-center gap-3">
-            <div className="grid size-12 place-items-center border border-ion/40 bg-ion/10">
-              <Dna className="size-6 text-ion" />
+        <Panel className="overflow-hidden">
+          <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="grid size-12 shrink-0 place-items-center border border-ion/40 bg-ion/10">
+                <Dna className="size-6 text-ion" />
+              </div>
+              <div className="min-w-0">
+                <p className="font-mono text-xs uppercase text-ion">Communication Reading</p>
+                <h2 className="mt-1 text-xl font-semibold text-white sm:text-2xl">{latest ? latest.name : "Awaiting first signal"}</h2>
+              </div>
             </div>
-            <div>
-              <p className="font-mono text-xs uppercase tracking-[0.22em] text-ion">Communication Reading</p>
-              <h2 className="text-2xl font-semibold text-white">{latest ? latest.name : "Awaiting first signal"}</h2>
-            </div>
+            <div className="font-mono text-[10px] uppercase text-slate-500 sm:pt-2 sm:text-right">scientific oracle interface</div>
           </div>
           <Spectrogram seed={latest?.spectrogramSeed ?? 19} />
           <div className="mt-5 grid gap-3 sm:grid-cols-3">

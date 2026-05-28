@@ -1,6 +1,7 @@
 import type { Recording } from "@/lib/types";
 import { ConfidenceBar, Panel } from "@/components/ui";
 import { Spectrogram } from "@/components/spectrogram";
+import { AcousticFeaturePanel } from "@/components/acoustic-feature-panel";
 
 export function ReadingCard({ recording }: { recording: Recording }) {
   return (
@@ -17,7 +18,9 @@ export function ReadingCard({ recording }: { recording: Recording }) {
         </div>
       </div>
 
-      <Spectrogram seed={recording.spectrogramSeed} />
+      <Spectrogram seed={recording.spectrogramSeed} bands={recording.acousticFeatures?.spectralBands} />
+
+      <AcousticFeaturePanel features={recording.acousticFeatures} />
 
       <div className="grid gap-4 md:grid-cols-3">
         <ConfidenceBar label="Signal confidence" value={recording.analysis.signalConfidence} />

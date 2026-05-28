@@ -4,13 +4,20 @@ Animal Communication Intelligence
 
 Map the frequency of animal meaning.
 
-PhonomeFrequency is a production-ready MVP foundation for an animal communication intelligence system. It detects acoustic patterns, behavioral context, and repeated signal history to produce probability-based translation maps before real audio ML is added.
+PhonomeFrequency is a production-ready MVP foundation for an animal communication intelligence system. It extracts browser-side acoustic features, combines them with behavioral context and repeated signal history, and produces probability-based translation maps before real audio ML is added.
 
 ## What It Does
 
 - Upload animal audio or record from the microphone.
 - Store recordings locally in browser storage for development.
-- Generate spectrogram-style visual placeholders.
+- Generate spectrogram-style visuals from decoded acoustic bands when possible, with a fallback placeholder for undecoded files.
+- Extract browser-side acoustic features:
+  - duration
+  - frequency centroid
+  - estimated pitch
+  - pulse count
+  - pulse rate
+  - dominant band label
 - Produce probability-based readings with:
   - likely species
   - signal category
@@ -40,6 +47,7 @@ PhonomeFrequency does not claim perfect animal translation. This MVP does not in
 - React
 - TypeScript
 - Tailwind CSS
+- Web Audio API feature extraction
 - Local browser storage for MVP data
 
 ## Run Locally
@@ -78,7 +86,7 @@ npm run lint
 
 ## Next Real ML Steps
 
-1. Replace placeholder spectrogram visuals with Web Audio API frequency extraction.
+1. Expand browser-side extraction into richer pitch contours, envelopes, and call intervals.
 2. Add durable file storage and a database backend.
 3. Build licensed acoustic archive ingestion for public and partner bioacoustic datasets.
 4. Build species-specific acoustic feature extraction.

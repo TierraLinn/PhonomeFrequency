@@ -1,4 +1,4 @@
-import type { AnimalProfile, Reading, SignalCategory } from "@/lib/types";
+import type { AcousticFeatures, AnimalProfile, Reading, SignalCategory } from "@/lib/types";
 
 const categories: SignalCategory[] = [
   "request",
@@ -36,13 +36,18 @@ const interpretations: Record<SignalCategory, string[]> = {
   ]
 };
 
-export function analyzeSignal(profile: AnimalProfile, fileName: string, contextNote: string): Reading {
+export function analyzeSignal(profile: AnimalProfile, fileName: string, contextNote: string, features?: AcousticFeatures): Reading {
   const seed = hash(`${profile.id}:${fileName}:${contextNote}:${Date.now()}`);
-  const category = chooseCategory(profile, contextNote, seed);
+  const category = chooseCategory(profile, contextNote, seed, features);
   const confidenceBase = 42 + (seed % 27);
   const maturityInfluence = Math.round(profile.profileMaturity * 0.22);
-  const signalConfidence = clamp(confidenceBase + maturityInfluence, 28, 94);
-  const patternStrength = clamp(38 + ((seed >> 3) % 41) + Math.round(profile.recordings.length * 1.8), 20, 98);
+  const acousticInfluence = features ? Math.round(features.pitchConfidence * 10 + Math.min(8, features.pulseCount)) : 0;
+  const signalConfidence = clamp(confidenceBase + maturityInfluence + acousticInfluence, 28, 94);
+  const patternStrength = clamp(
+    38 + ((seed >> 3) % 31) + Math.round(profile.recordings.length * 1.8) + (features ? Math.min(18, Math.round(features.rmsAmplitude * 34 + features.pulseRatePerSecond * 2)) : 0),
+    20,
+    98
+  );
   const profileMaturity = clamp(profile.profileMaturity + Math.round(profile.recordings.length * 2.1), 15, 99);
 
   return {
@@ -55,7 +60,8 @@ export function analyzeSignal(profile: AnimalProfile, fileName: string, contextN
     supportingEvidence: [
       `Matched against ${profile.name}'s ${profile.recordings.length || "early"} stored recording marker${profile.recordings.length === 1 ? "" : "s"}.`,
       `Known context labels: ${profile.confirmedContextLabels.length ? profile.confirmedContextLabels.join(", ") : "none confirmed yet"}.`,
-      `Detected simulated envelope family: ${profile.strongestRepeatedSignal}.`,
+      features ? acousticEvidence(features) : `Detected simulated envelope family: ${profile.strongestRepeatedSignal}.`,
+      features ? `Pulse structure: ${features.pulseCount} detected pulse${features.pulseCount === 1 ? "" : "s"} at ${features.pulseRatePerSecond}/sec, with ${features.dominantBand}.` : "No decoded acoustic feature layer was available for this reading.",
       contextNote ? `Handler note included: "${contextNote.slice(0, 96)}"` : "No handler note supplied; reading weighted toward acoustic pattern only."
     ],
     recommendedObservation: recommendationFor(category)
@@ -71,14 +77,26 @@ export function hash(input: string) {
   return Math.abs(value);
 }
 
-function chooseCategory(profile: AnimalProfile, contextNote: string, seed: number) {
+function chooseCategory(profile: AnimalProfile, contextNote: string, seed: number, features?: AcousticFeatures) {
   const note = contextNote.toLowerCase();
   if (note.includes("food") || profile.confirmedContextLabels.includes("food")) return "request";
   if (note.includes("door") || note.includes("outside")) return "environmental-alert";
   if (note.includes("play") || profile.confirmedContextLabels.includes("play")) return "play-invitation";
   if (note.includes("stress") || note.includes("hurt") || note.includes("scared")) return "stress-marker";
   if (note.includes("attention") || profile.confirmedContextLabels.includes("attention")) return "social-contact";
+  if (features && features.pulseRatePerSecond > 3.5 && features.spectralCentroidHz > 2200) return "environmental-alert";
+  if (features && features.estimatedPitchHz && features.estimatedPitchHz < 180 && features.rmsAmplitude > 0.08) return "stress-marker";
+  if (features && features.pulseCount >= 4 && features.dynamicRangeDb > 10) return "request";
   return categories[seed % categories.length];
+}
+
+function acousticEvidence(features: AcousticFeatures) {
+  if (features.source === "byte-fallback") {
+    return "Audio decoder could not read the file, so PhonomeFrequency used a byte-level file signature fallback.";
+  }
+
+  const pitch = features.estimatedPitchHz ? `${features.estimatedPitchHz} Hz estimated pitch` : "no stable pitch lock";
+  return `Decoded acoustic layer: ${Math.round(features.durationMs / 10) / 100}s sample, ${features.spectralCentroidHz} Hz centroid, ${pitch}.`;
 }
 
 function recommendationFor(category: SignalCategory) {

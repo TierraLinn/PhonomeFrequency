@@ -69,7 +69,7 @@ function AnimalProfileDetailContent() {
           <div className="grid gap-4 lg:grid-cols-2">
             {recordings.map((recording) => (
               <Link key={recording.id} href={`/reading?recording=${recording.id}`} className="border border-white/10 bg-white/[0.03] p-4 transition hover:border-ion/40">
-                <Spectrogram seed={recording.spectrogramSeed} compact />
+                <Spectrogram seed={recording.spectrogramSeed} bands={recording.acousticFeatures?.spectralBands} compact />
                 <h3 className="mt-4 text-lg font-semibold text-white">{recording.name}</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-400">{recording.analysis.interpretation}</p>
               </Link>

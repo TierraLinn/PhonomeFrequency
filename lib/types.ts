@@ -40,6 +40,7 @@ export type Recording = {
   createdAt: string;
   contextNote: string;
   spectrogramSeed: number;
+  acousticFeatures?: AcousticFeatures;
   analysis: Reading;
   feedback?: Feedback;
 };
@@ -53,6 +54,25 @@ export type Reading = {
   profileMaturity: number;
   supportingEvidence: string[];
   recommendedObservation: string;
+};
+
+export type AcousticFeatures = {
+  source: "decoded-audio" | "byte-fallback";
+  durationMs: number;
+  sampleRate: number;
+  peakAmplitude: number;
+  rmsAmplitude: number;
+  dynamicRangeDb: number;
+  zeroCrossingRate: number;
+  estimatedPitchHz: number | null;
+  pitchConfidence: number;
+  spectralCentroidHz: number;
+  spectralSpreadHz: number;
+  dominantBand: string;
+  pulseCount: number;
+  pulseRatePerSecond: number;
+  spectralBands: number[];
+  waveform: number[];
 };
 
 export type Feedback = {

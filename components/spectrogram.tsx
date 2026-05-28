@@ -2,14 +2,23 @@
 
 import { useMemo } from "react";
 
-export function Spectrogram({ seed = 7, compact = false }: { seed?: number; compact?: boolean }) {
+export function Spectrogram({ seed = 7, compact = false, bands }: { seed?: number; compact?: boolean; bands?: number[] }) {
   const bars = useMemo(
-    () =>
-      Array.from({ length: compact ? 34 : 64 }, (_, index) => {
+    () => {
+      if (bands?.length) {
+        const targetLength = compact ? 34 : 64;
+        return Array.from({ length: targetLength }, (_, index) => {
+          const sourceIndex = Math.floor((index / targetLength) * bands.length);
+          return Math.max(8, Math.min(100, bands[sourceIndex] ?? 12));
+        });
+      }
+
+      return Array.from({ length: compact ? 34 : 64 }, (_, index) => {
         const raw = Math.sin((index + seed) * 0.74) * 44 + Math.cos((index + seed) * 0.19) * 26 + 48;
         return Math.max(12, Math.min(100, Math.round(raw)));
-      }),
-    [compact, seed]
+      });
+    },
+    [bands, compact, seed]
   );
 
   return (
@@ -28,7 +37,7 @@ export function Spectrogram({ seed = 7, compact = false }: { seed?: number; comp
           />
         ))}
       </div>
-      <div className="absolute bottom-3 left-3 font-mono text-[10px] uppercase tracking-[0.24em] text-ion/70">spectral placeholder</div>
+      <div className="absolute bottom-3 left-3 font-mono text-[10px] uppercase tracking-[0.24em] text-ion/70">{bands?.length ? "decoded spectral bands" : "spectral placeholder"}</div>
     </div>
   );
 }

@@ -17,7 +17,7 @@ export default function ArchivePage() {
             const profile = store.profiles.find((item) => item.id === recording.animalId);
             return (
               <Link key={recording.id} href={`/reading?recording=${recording.id}`} className="grid gap-4 border border-white/10 bg-white/[0.03] p-4 transition hover:border-ion/40 md:grid-cols-[180px_1fr]">
-                <Spectrogram seed={recording.spectrogramSeed} compact />
+                <Spectrogram seed={recording.spectrogramSeed} bands={recording.acousticFeatures?.spectralBands} compact />
                 <div>
                   <div className="flex items-start justify-between gap-3">
                     <div>
@@ -30,6 +30,7 @@ export default function ArchivePage() {
                   <div className="mt-4 flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.14em] text-slate-400">
                     <span className="border border-white/10 px-2 py-1">{recording.analysis.signalCategory}</span>
                     <span className="border border-white/10 px-2 py-1">{recording.sizeLabel}</span>
+                    <span className="border border-white/10 px-2 py-1">{recording.acousticFeatures ? "feature layer" : "sim layer"}</span>
                     <span className="border border-white/10 px-2 py-1">{recording.feedback ? "feedback logged" : "feedback open"}</span>
                   </div>
                 </div>
