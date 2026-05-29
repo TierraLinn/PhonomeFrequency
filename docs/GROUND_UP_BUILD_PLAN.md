@@ -56,19 +56,26 @@ Next refinement:
 
 Goal: Move from local browser storage to a real public app backend.
 
-Build:
+Built now:
 
-- User accounts.
-- Database-backed animal profiles.
-- Database-backed recordings.
+- Optional Supabase cloud archive bridge.
+- Anonymous owner identity for browser-based cloud sync.
+- Database schema for animal profiles.
+- Database schema for recording/readings.
+- Row-level security policies for owner-owned records.
+- Settings / Privacy sync controls.
+- GitHub Actions variables wired into static Pages builds.
+
+Still to build:
+
+- Permanent user accounts.
 - Object storage for audio files.
-- Reading history.
-- Feedback label history.
-- Privacy and deletion controls.
+- Cross-device account recovery.
+- Privacy deletion controls for cloud rows.
 
 Output:
 
-- A user can return later and still have their animals, readings, and archive.
+- A user can sync animal profiles, acoustic feature records, readings, and feedback into a real database when Supabase is configured.
 
 ## Phase 4: Archive Intelligence Layer
 

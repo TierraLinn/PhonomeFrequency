@@ -49,6 +49,7 @@ PhonomeFrequency does not claim perfect animal translation. This MVP does not in
 - Tailwind CSS
 - Web Audio API feature extraction
 - Local browser storage for MVP data
+- Optional Supabase cloud archive bridge
 
 ## Run Locally
 
@@ -84,20 +85,31 @@ npm run lint
 - `/research-vault` - Research and roadmap notes
 - `/settings` - Privacy, export, and reset controls
 
+## Optional Cloud Archive
+
+PhonomeFrequency now includes a Supabase bridge for database-backed profiles, readings, acoustic feature layers, and feedback history. It stays disabled until `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are configured.
+
+Setup files:
+
+- `supabase/schema.sql`
+- `docs/SUPABASE_SETUP.md`
+
 ## Next Real ML Steps
 
 1. Expand browser-side extraction into richer pitch contours, envelopes, and call intervals.
-2. Add durable file storage and a database backend.
-3. Build licensed acoustic archive ingestion for public and partner bioacoustic datasets.
-4. Build species-specific acoustic feature extraction.
-5. Train context-aware classifiers using confirmed feedback labels.
-6. Add profile-specific calibration so repeated individual recordings become more useful over time.
+2. Add Supabase Storage for original audio files.
+3. Add durable sign-in so users can return from any device.
+4. Build licensed acoustic archive ingestion for public and partner bioacoustic datasets.
+5. Build species-specific acoustic feature extraction.
+6. Train context-aware classifiers using confirmed feedback labels.
+7. Add profile-specific calibration so repeated individual recordings become more useful over time.
 
 ## Planning Docs
 
 - `docs/PRODUCT_BLUEPRINT.md`
 - `docs/DEPLOYMENT.md`
 - `docs/GROUND_UP_BUILD_PLAN.md`
+- `docs/SUPABASE_SETUP.md`
 
 ## Free Deployment
 

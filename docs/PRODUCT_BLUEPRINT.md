@@ -28,12 +28,13 @@ PhonomeFrequency does not claim perfect animal translation. It builds translatio
 - Feedback loop that improves profile confidence and maturity.
 - Research Vault and privacy controls.
 - Local browser storage for development.
+- Optional Supabase cloud archive bridge for profiles, readings, acoustic features, and feedback.
 - Static health file for deployment checks.
 
 ## Next Backend Milestone
 
-1. Add database tables for users, animal profiles, recordings, readings, feedback labels, and source archive metadata.
-2. Store audio in object storage instead of local browser storage.
+1. Add permanent user accounts on top of the current anonymous cloud identity.
+2. Store original audio in Supabase Storage instead of local browser storage.
 3. Move analysis into a server route so uploaded recordings can be queued, processed, and re-read.
 4. Expand real feature extraction with richer spectrograms, pitch contours, envelope, harmonicity, repetition, and call intervals.
 5. Add licensed acoustic archive ingestion.

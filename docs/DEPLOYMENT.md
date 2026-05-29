@@ -60,11 +60,25 @@ Expected response:
 10. Open the Pages URL shown by GitHub.
 11. Open `/health.json` on the deployed URL.
 
+## Optional Supabase Cloud Archive
+
+The app can stay fully local on GitHub Pages, or it can sync profiles, readings, acoustic feature layers, and feedback to Supabase.
+
+To activate the cloud archive:
+
+1. Follow `docs/SUPABASE_SETUP.md`.
+2. Add these GitHub repository variables:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+3. Rerun the GitHub Pages workflow.
+4. Open **Privacy** in the live app.
+5. Use **Initialize cloud identity**, then **Push local to cloud**.
+
 ## Public MVP Limitations
 
-- Recordings are stored locally in each user's browser.
-- Audio is not uploaded to a backend yet.
-- Analysis is simulated, not real ML.
+- Original audio file bytes are stored locally in each user's browser until Supabase Storage is added.
+- Cloud sync stores recording metadata, readings, acoustic features, and feedback when configured.
+- Analysis is feature-informed and simulated, not real trained ML.
 - No historical archive ingestion is connected yet.
 - No account system is connected yet.
 - GitHub Pages is static hosting, so backend APIs are not active yet.
